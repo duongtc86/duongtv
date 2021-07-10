@@ -9,7 +9,7 @@ const server = http.createServer(app);
 app.use(cors());
 
 app.get('/', function (req, res) {
-    YouTube.trending()
+    YouTube.homepage()
         .then(
             data => {
                 var items = [];
