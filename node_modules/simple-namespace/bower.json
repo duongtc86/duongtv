@@ -1,0 +1,27 @@
+{
+  "name": "simple-namespace",
+  "version": "0.2.0",
+  "homepage": "https://github.com/drzax/simple-namespace",
+  "authors": [
+    "Simon Elvery <simon@elvery.net>"
+  ],
+  "description": "An easy (and almost-too-simple) method for generating a 'namespace'.",
+  "main": "lib/index.js",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "namespace"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "Gruntfile.js"
+  ]
+}
