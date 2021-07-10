@@ -1,22 +1,40 @@
 {
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "laundry": "^1.8.25",
-    "youtube-dl": "^1.13.1",
-    "youtube-sr": "^4.1.7"
-  },
+  
   "name": "api",
+  
   "version": "1.0.0",
-  "engines": {
-    "node": "14.x"
-  },
+  
   "main": "app.js",
+  
   "devDependencies": {},
+  
   "scripts": {
-    "start": "node app.js"
+  
+    
+  "start": "node app.js"
+  
   },
+  
   "author": "duongtc86",
+  
   "license": "ISC",
-  "description": ""
+  
+  "description": "",
+  
+  "dependencies": {
+  
+    
+  "cors": "^2.8.5",
+  
+    
+  "express": "^4.17.1",
+  
+    
+  "laundry": "^1.8.25",
+  
+    
+  "youtube-sr": "^4.1.7",
+  "youtube-dl": "^1.13.1"
+  
+  }
 }
