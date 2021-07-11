@@ -7,9 +7,10 @@ var cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 app.use(cors());
-
+var list_video=[];
 app.get('/', function (req, res) {
-    YouTube.homepage()
+    if(list_video.length<10){
+        YouTube.search('am nhac', { limit: 25 })
         .then(
             data => {
                 var items = [];
@@ -29,6 +30,13 @@ app.get('/', function (req, res) {
             }
         )
         .catch(console.error);
+    }
+  
+});
+app.get('/addvideo/:s', function (req, res){
+    var s = JSON.parse( req.params.s);
+    console.log(s.id);
+    res.end();
 });
 app.get('/search/:s', function (req, res) {
 
