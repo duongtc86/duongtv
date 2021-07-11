@@ -8,7 +8,7 @@ let app = new Vue({
     },
     created: function () {
       
-        ws = new WebSocket("ws:" + window.location.host);
+        ws = new WebSocket("wss:" + window.location.host);
     },
     methods: {
         send_data: function () {
