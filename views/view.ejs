@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/vuetify.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/axios.js"></script>
+  <script src="js/vue.min.js"></script>
+  <script src="js/vuetify.min.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <v-app dark>
+      <v-navigation-drawer v-model="videop" temporary right app width="100vw" @click.stop="videop =! videop">
+        <div class="video_plane">
+          <video :src="app_data.video_url" ref="myvideo" autoplay name="media"></video>
+          <div class="topbar ">
+            <v-btn  icon @click.stop="back_video()" color="red">
+              <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
+          
+          </div>
+
+          <div class="panel_loading d-flex justify-center align-center mb-6" v-if="app_data.video_url === ''">
+
+          </div>
+          <div class="bottom_control transparent  ">
+            <v-bottom-sheet v-model="dexuat" persistent>
+              <v-sheet class="transparent">
+                <v-container>
+                  <v-progress-linear :value="percentage" class="my-4" height="4" color="red darken-1">
+                  </v-progress-linear>
+                </v-container>
+                <v-slide-group center-active show-arrows v-model="video_dexuat_select">
+                  <v-slide-item v-for="n in video_dexuat" :key="n" v-slot="{ active, toggle }">
+                    <v-card :color="active ? 'white black--text ' : 'grey darken-3 white--text'" class="ma-2 pa-4"
+                      height="300" width="320" @click="toggle">
+                      <v-row class="fill-height" justify="center">
+                        <v-scale-transition>
+                          <div class="text-center">
+                            <img :src="n.thumbnail" width="100%" alt="" />
+                            <div class="mt-2 pa-2">
+                              {{n.title}}
+                            </div>
+                          </div>
+                          <!-- <v-icon v-if="active" color="white" size="48" v-text="'mdi-close-circle-outline'"></v-icon> -->
+                        </v-scale-transition>
+                      </v-row>
+                    </v-card>
+                  </v-slide-item>
+
+                </v-slide-group>
+              </v-sheet>
+            </v-bottom-sheet>
+          </div>
+
+        </div>
+      </v-navigation-drawer>
+
+      <v-app-bar color="gray darken-3" dark app>
+        <v-spacer></v-spacer>
+        <v-text-field id="input" flat solo-inverted hide-details prepend-inner-icon="mdi-magnify" 
+          label="Tìm kiếm video" color="white" v-model="app_data.video_search" @keydown.13="getsearch">
+        </v-text-field>
+
+        <v-spacer></v-spacer>
+
+      </v-app-bar>
+
+      <v-main class="grey darken-3">
+        <v-container v-if=sheet>
+          <v-row>
+            <v-col lg="3" elevation-3>
+              <v-chip-group active-class="error--text" column>
+                <v-chip v-for="(tag,i) in goiy" :key="tag" class="bk" :index="i">
+                  {{ tag }}
+                </v-chip>
+              </v-chip-group>
+
+            </v-col>
+            <v-col lg="9">
+              <v-sheet class="text-center grey darken-3  keyboard"></v-sheet>
+              <v-card width="800" class="grey darken-3 ml-8" flat>
+                <div class="d-flex">
+                  <v-btn v-for="s in so" :key="s" class="bk ma-2" :str="s">
+                    {{s}}
+                  </v-btn>
+                </div>
+                <div class="d-flex">
+                  <v-btn v-for="c1 in chu1" :key="c1" class="bk ma-2" :str="c1">
+                    {{c1}}
+                  </v-btn>
+                </div>
+                <div class="d-flex">
+                  <v-btn v-for="c1 in chu2" :key="c1" class="bk ma-2" :str="c1">
+                    {{c1}}
+                  </v-btn>
+                  <v-btn class="bk ma-2" str="esc"> esc </v-btn>
+                </div>
+                <div class="d-flex">
+                  <v-btn class="bk ma-2 flex-grow-1" str=" "> Space</v-btn>
+                  <v-btn v-for="c1 in chu3" :key="c1" class="bk ma-2" :str="c1">
+                    {{c1}}
+                  </v-btn>
+                  <v-btn class="bk ma-2" str="del">
+                    <v-icon>mdi-arrow-left</v-icon>
+                  </v-btn>
+                </div>
+                <div class="pa-2">
+                  <v-btn block class="py-6 bk" str="enter">Tìm kiếm</v-btn>
+                </div>
+              </v-card>
+              </v-sheet>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col lg="3"></v-col>
+            <v-col lg="9">
+              <div width="800" class="pl-16">
+                <v-btn color="error">Thoát</v-btn>
+                <v-btn color="success">xóa chữ</v-btn>
+                <v-btn color="warning">dấu cách</v-btn>
+                <v-btn color="info">Tìm kiếm</v-btn>
+              </div>
+            </v-col>
+          </v-row>
+
+        </v-container>
+        <v-container>
+          <div class="card_list d-flex flex-wrap">
+            <div class="ma-2 video_container" v-for="v in app_data.videos " :key="v" @click="play_video(v.id)"
+              ref="video_select">
+              <card>
+                <img :src="v.thumbnail" width="100%" alt="" />
+                <div class="mt-2 pa-2 video-title" v-text="v.title">
+                  <!-- {{v.title}} -->
+                </div>
+              </card>
+            </div>
+          </div>
+        </v-container>
+
+        <v-bottom-sheet v-model="sheet" hide-overlay persistent></v-bottom-sheet>
+      </v-main>
+
+    </v-app>
+  </div>
+  <script>
+    var host = "http://duongtv.herokuapp.com";
+    //var ws="ws:duongtv.herokuapp.com"
+     //var host = "http://localhost:3000";
+    // var host = "http://192.168.1.244:3000";
+
+  
+    var app = new Vue({
+      el: "#app",
+      vuetify: new Vuetify(),
+      data: {
+        sheet: false,
+        dexuat: false,
+        videop: false,
+        app_data: {
+          url: host,
+          videos: [],
+          video_search: "",
+          video_select: 0,
+          video_url: "",
+        },
+        so: "1234567890".split(""),
+        chu1: "QWERTYUIOP".split(""),
+        chu2: "ASDFGHJKL".split(""),
+        chu3: "ZXCVBNM".split(""),
+        state: 0,
+        goiy: ["âm nhạc", "tin tức", "phim truyện", "thể thao", "karaoke", "remix"],
+        video_dexuat: [],
+        video_dexuat_select: 0,
+        video_dexuat_search: '',
+        percentage: 0,
+        connection: null
+      },
+      created() {
+
+      },
+      methods: {
+        searchs() {
+          this.getsearch;
+        },
+        play_video(id) {
+          this.state = 2;
+          this.app_data.video_url = "";
+          this.videop = true;
+          let elHtml = document.getElementsByTagName('html')[0];
+          elHtml.style.overflowY = 'hidden';
+
+          this.video_dexuat_search = '';
+
+          axios.get(this.app_data.url + "/video/" + id).then(function (res) {
+            app.app_data.video_url = res.data.url;
+            var req = app.app_data.videos.filter(obj => {
+              return obj.id === res.data.id;
+            })
+            app.video_dexuat_search = req[0].title;
+            app.getdexuat;
+          });
+        },
+        back_video() {
+          this.videop = false;
+          this.video_url = "";
+          this.$refs.myvideo.pause();
+          this.state = 0;
+          let elHtml = document.getElementsByTagName('html')[0]
+          elHtml.style.overflowY = null
+        },
+        open_search() {
+          this.state = 1;
+          this.sheet = true;
+          this.$vuetify.goTo(0);
+        },
+        lose_search() {
+          this.state = 0;
+          this.sheet = false;
+
+        },
+
+        choise_play() {
+          console.log("xl video");
+        },
+      },
+      watch: {
+        sheet: function (newVal, oldVal) {
+          if (newVal) {
+            console.log("change state");
+
+          }
+        },
+        videop: function (newVal, oldVal) {
+          if (newVal) {
+            get_seek_time();
+          }
+        },
+        "app_data.video_select": function (newVal, oldVal) {
+
+          choise_video(newVal, oldVal);
+        },
+        dexuat: function (newVal) {
+          if (newVal) {
+            get_seek_time();
+          }
+        },
+
+      },
+      computed: {
+        gethome() {
+          axios.get(this.app_data.url+"/homepage").then(function (res) {
+            app.$set((app.app_data.videos = res.data));
+            first_active();
+          });
+        },
+        getsearch() {
+          axios
+            .get(this.app_data.url + "/search/" + this.app_data.video_search)
+            .then(function (res) {
+              app.$set((app.app_data.videos = res.data));
+              app.app_data.video_search = '';
+              first_active();
+            });
+        },
+        getdexuat() {
+          console.log(this.app_data.url + "/search/" + this.video_dexuat_search)
+          axios
+            .get(this.app_data.url + "/search/" + this.video_dexuat_search)
+            .then(function (res) {
+              app.$set((app.video_dexuat = res.data));
+            });
+        },
+      },
+
+
+      mounted() {
+
+        this.gethome;
+        this.play_video;
+        this.app_data.video_select = 0;
+        this.$refs.myvideo.addEventListener("ended", auto_play, false);
+
+        function auto_play(e) {
+          if (this.video_dexuat_select < Object.keys(this.video_dexuat).length - 2) {
+            this.video_dexuat_select++;
+            this.app_data.video_url = "";
+            var id = this.video_dexuat[this.video_dexuat_select].id;
+            axios.get(this.app_data.url + "/video/" + id).then(function (res) {
+              app.app_data.video_url = res.data.url;
+            });
+
+          }
+          else {
+            alert('Hết danh sách đề xuất tìm cái khác coi đi !!!');
+          }
+
+        }
+        // tizen.tvinputdevice.registerKey('ColorF0Red');
+        // tizen.tvinputdevice.registerKey('ColorF1Green');
+        // tizen.tvinputdevice.registerKey('ColorF2Yellow');
+        // tizen.tvinputdevice.registerKey('ColorF3Blue');
+        // document.addEventListener("keydown", (e) => {
+        //   // console.log(e.key, e.keyCode);
+        //   if (e.keyCode === 13) {
+
+        //     if (this.state === 0) {
+        //       this.play_video(this.app_data.videos[this.app_data.video_select].id);
+        //       this.state = 2;
+        //     }
+        //     if (this.state === 1) {
+        //       add_search();
+        //     }
+        //     if (this.state === 3) {
+        //       this.state = 2;
+        //       this.dexuat = false;
+        //       this.app_data.video_url = "";
+        //       var id = this.video_dexuat[this.video_dexuat_select].id;
+        //       axios.get(this.app_data.url + "/video/" + id).then(function (res) {
+        //         app.app_data.video_url = res.data.url;
+        //       });
+
+        //     }
+        //     // this.searchs();
+        //   }
+        //   if (e.keyCode === 37) {
+        //     //left
+        //     if (this.state === 0) {
+        //       if (this.app_data.video_select > 0) {
+        //         this.app_data.video_select--;
+        //       }
+
+        //     }
+        //     if (this.state === 1) {
+        //       choise_search(-1);
+        //     }
+        //     if (this.state === 2) {
+        //       seekToTime(-15);
+        //     }
+        //     if (this.state === 3) {
+        //       if (this.video_dexuat_select > 0) {
+        //         this.video_dexuat_select--;
+        //       }
+        //     }
+        //   }
+        //   if (e.keyCode === 38) {
+        //     //up
+        //     if (this.state === 0) {
+        //       if (this.app_data.video_select > 4) {
+        //         this.app_data.video_select -= 5;
+        //       }
+        //       else {
+        //         this.open_search();
+
+        //       }
+        //     }
+        //     if (this.state === 1) {
+        //       choise_search(-10);
+        //     }
+        //     if (this.state === 3) {
+        //       this.dexuat = false;
+        //       this.state = 2;
+        //     }
+        //   }
+        //   if (e.keyCode === 39) {
+        //     //right
+        //     if (this.state === 0) {
+        //       if (this.app_data.video_select < Object.keys(this.app_data.videos).length - 2) {
+        //         this.app_data.video_select++;
+        //       }
+        //     }
+        //     if (this.state === 1) {
+        //       choise_search(1);
+        //     }
+        //     if (this.state === 2) {
+        //       seekToTime(15);
+        //     }
+        //     if (this.state === 3) {
+        //       if (this.video_dexuat_select < Object.keys(this.video_dexuat).length - 2) {
+        //         this.video_dexuat_select++;
+
+        //       }
+        //     }
+        //   }
+        //   if (e.keyCode === 40) {
+        //     //down
+        //     if (this.state === 0) {
+        //       if (this.app_data.video_select < Object.keys(this.app_data.videos).length - 6) {
+
+        //         this.app_data.video_select += 5;
+        //       }
+
+        //     }
+        //     if (this.state === 1) {
+        //       choise_search(10);
+        //     }
+        //     if (this.state === 2) {
+        //       this.dexuat = true;
+        //       this.state = 3;
+        //     }
+        //   }
+        //   if (e.keyCode === 403) {
+        //     //do
+
+        //     if (this.state === 1) {
+        //       document.querySelector('#input').classList.remove('white-text');
+        //       app.lose_search();
+        //     }
+        //   }
+
+        //   if (e.keyCode === 404) {
+        //     //xanh la
+
+        //     if (this.state === 1) {
+        //       app.app_data.video_search = app.app_data.video_search.substring(0, app.app_data.video_search.length - 1);
+
+        //     }
+        //   }
+        //   if (e.keyCode === 405) {
+        //     //vang
+
+        //     if (this.state === 1) {
+        //       app.app_data.video_search += " ";
+        //       axios
+        //         .get(app.app_data.url + "/autocomplete/" + app.app_data.video_search)
+        //         .then(function (res) {
+        //           app.goiy = res.data;
+        //         });
+        //     }
+        //   }
+        //   if (e.keyCode === 406) {
+        //     //xanh duong
+
+        //     if (this.state === 1) {
+
+        //       document.querySelector('#input').classList.remove('white--text');
+        //       app.searchs();
+        //       app.lose_search();
+
+        //     }
+        //   }
+        //   if (e.keyCode === 10009) {
+        //     //back
+        //     this.back_video();
+        //   }
+        // });
+      },
+    });
+    var key = 0;
+    function first_active() {
+      var run = setInterval(function () {
+        var v = document.querySelectorAll(".video_container");
+        if (v.length > 0) {
+          v[0].classList.add("hover");
+          app.app_data.video_select = 0;
+          clearInterval(run);
+        }
+      }, 100);
+    }
+    function choise_video(n, o) {
+      console.log("xu ly con video");
+      var v = document.querySelectorAll(".video_container");
+      v[o].classList.remove("hover");
+      v[n].classList.add("hover");
+      app.$vuetify.goTo(v[n]);
+    }
+    function choise_search(i) {
+      var run = setInterval(function () {
+        var k = document.querySelectorAll(".bk");
+        if (k.length > 0) {
+          clearInterval(run);
+          key += i;
+          if (key < 0) {
+            key = 0;
+          }
+          if (key > k.length - 1) {
+            key = k.length - 1;
+          }
+          k.forEach(el => {
+            el.classList.remove("red", "white--text");
+          });
+
+          k[key].classList.add("red", "white--text");
+          document.querySelector('#input').classList.add('white--text');
+
+        }
+      }, 100);
+
+    }
+    function add_search() {
+      var k = document.querySelectorAll(".bk");
+      var t = k[key].getAttribute('str');
+      var ts = app.app_data.video_search;
+      if (t !== null) {
+        if (t === 'esc' || t === 'enter' || t === 'del' || t === ' ') {
+          if (t === 'esc') {
+            document.querySelector('#input').classList.remove('white-text');
+            app.lose_search();
+          }
+          if (t === 'enter') {
+            document.querySelector('#input').classList.remove('white--text');
+            app.searchs();
+            app.lose_search();
+          }
+          if (t === 'del') {
+            app.app_data.video_search = ts.substring(0, ts.length - 1);
+          }
+          if (t === ' ') {
+
+            app.app_data.video_search += " ";
+            axios
+              .get(app.app_data.url + "/autocomplete/" + app.app_data.video_search)
+              .then(function (res) {
+                app.goiy = res.data;
+              });
+          }
+
+        }
+        else {
+          ts += t;
+          app.app_data.video_search = ts;
+
+        }
+      }
+      else {
+        console.log('tim nhanh')
+        var i = k[key].getAttribute('index');
+        app.app_data.video_search = app.goiy[i];
+        document.querySelector('#input').classList.remove('white--text');
+        app.searchs();
+        app.lose_search();
+      }
+    }
+    function seekToTime(ts) {
+      var video_element = document.querySelector('video');
+      video_element.pause();
+      video_element.currentTime += ts;
+      var timer = setInterval(function () {
+        if (video_element.paused && video_element.readyState == 4 || !video_element.paused) {
+          video_element.play();
+          clearInterval(timer);
+        }
+      }, 100);
+    }
+    function get_seek_time() {
+      var player = document.querySelector('video');
+      var per = Math.round((player.currentTime * 100) / player.duration);
+      if (!isNaN(per)) {
+        app.percentage = per;
+        console.log(player.currentTime);
+        console.log(player.duration)
+        console.log(app.percentage)
+
+      }
+
+    }
+  </script>
+</body>
+
+</html>

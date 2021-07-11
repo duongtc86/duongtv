@@ -21,6 +21,12 @@ app.get('/index', function (req, res) {
 
 
 });
+app.get('/views', function (req, res) {
+    res.render('view');
+    res.end();
+
+
+});
 app.get('/homepage', function (req, res) {
     if(list_video.length<10){
         YouTube.search('am nhac', { limit: 25 })
