@@ -42,7 +42,7 @@ app.get('/search/:s', function (req, res) {
 
     var s = req.params.s;
     console.log(s);
-    YouTube.search(s, { limit: 25 })
+    YouTube.search(s+' viet nam', { limit: 25 })
         .then(
             data => {
                 var items = [];
@@ -88,7 +88,20 @@ app.get('/video/:id', function (req, res) {
 
 
 });
+app.get('/autocomplete/:s', function (req, res) {
+    var s = req.params.s;
+    console.log(s);
+    YouTube.getSuggestions(s)
+        .then(
+            data => {                
+                res.send(data);
+                res.end();
+            }
+        )
+        .catch(console.error);
 
+
+});
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, function () {
     console.log("start server");
