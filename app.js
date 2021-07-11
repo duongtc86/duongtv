@@ -2,13 +2,26 @@ const YouTube = require("youtube-sr").default;
 const http = require('http');
 const express = require('express');
 const youtubedl = require('youtube-dl');
+const websock = require('ws');
 var cors = require('cors');
-
 const app = express();
 const server = http.createServer(app);
+
+app.use(express.static("public"));
+app.set('views', './views');
+app.set('view engine', 'ejs')
+
+const wss = new websock.Server({ server });
+
 app.use(cors());
-var list_video=[];
-app.get('/', function (req, res) {
+var list_video = [];
+app.get('/index', function (req, res) {
+    res.render('index');
+    res.end();
+
+
+});
+app.get('/homepage', function (req, res) {
     if(list_video.length<10){
         YouTube.search('am nhac', { limit: 25 })
         .then(
@@ -31,10 +44,10 @@ app.get('/', function (req, res) {
         )
         .catch(console.error);
     }
-  
+
 });
-app.get('/addvideo/:s', function (req, res){
-    var s = JSON.parse( req.params.s);
+app.get('/addvideo/:s', function (req, res) {
+    var s = JSON.parse(req.params.s);
     console.log(s.id);
     res.end();
 });
@@ -42,7 +55,7 @@ app.get('/search/:s', function (req, res) {
 
     var s = req.params.s;
     console.log(s);
-    YouTube.search(s+' viet nam', { limit: 25 })
+    YouTube.search(s + ' viet nam', { limit: 25 })
         .then(
             data => {
                 var items = [];
@@ -93,7 +106,7 @@ app.get('/autocomplete/:s', function (req, res) {
     console.log(s);
     YouTube.getSuggestions(s)
         .then(
-            data => {                
+            data => {
                 res.send(data);
                 res.end();
             }
@@ -102,6 +115,22 @@ app.get('/autocomplete/:s', function (req, res) {
 
 
 });
+
+wss.on('connection', function (ws) {
+    console.log("connection");
+    ws.on('message', function (dt) {
+        console.log(dt);
+        broadcast(ws,dt);
+    });
+
+});
+function broadcast(ws, message) {
+    wss.clients.forEach(client => {
+        if (client != ws) {
+            client.send(message);
+        }
+    });
+}
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, function () {
     console.log("start server");

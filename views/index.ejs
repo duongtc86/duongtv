@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container class="pt-16">
+                    <v-card flat width="480" class="ma-auto">
+                        <v-container>
+                            <v-img
+                            max-height="150"  
+                            max-width="150"                 
+                            src="img/icon.png"
+                            class="mb-4"
+                          ></v-img>
+                            <v-text-field v-model="search" @keydown.13="send_data()" label="Nhập nội dung cần tìm" outlined prepend-inner-icon="mdi-magnify">
+                            </v-text-field>
+                            <v-btn block color="primary" elevation="2" x-large dark @click="send_data()">Send to Duong TV</v-btn>
+                            <v-banner v-text="info" class="text-center mt-8 red-text"></v-banner>
+                        </v-container>
+                    </v-card>
+                </v-container>
+
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="./js/index.js"></script>
+</body>
+
+</html>
